@@ -11,7 +11,7 @@ You can install this application by following these steps:
 Clone the repository to your local machine:
 
 ```
-git clone <repository_url>
+git clone https://github.com/KoshysDev/DisaggregatePY.git
 ```
 
 
