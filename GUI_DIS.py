@@ -6,6 +6,28 @@ from tkinter import ttk, messagebox, filedialog
 file_path = '' # Global variable to store the file path
 age_groups = {'0-4 y. o.': {'min': 0, 'max': 4}} # Global variable to store age groups
 
+#global config var
+#Adult Data
+age_adult_row = 'form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.age_adult'
+gender_adult_row = 'form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.gender_list_adult'
+dis_adult_row = 'form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.disability'
+
+#Child Data
+age_child_row = 'form.demographics.adding_child.hh_childs.list_for_child.repeated_data.age_child'
+gender_child_row = 'form.demographics.adding_child.hh_childs.list_for_child.repeated_data.gender_list_child'
+dis_child_row = 'form.demographics.adding_child.hh_childs.list_for_child.repeated_data.disability'
+
+#Applicant Data
+age_app_row = 'form.demographics.age'
+gender_app_row = 'form.demographics.gender'
+form_app_number = 'number'
+hh_size_app_row = 'form.demographics.hh_size'
+low_app_income = 'form.demographics.low_income'
+hh_idp_app_row = 'form.demographics.HH_hosting_IDPs'
+idp_app_row = 'form.demographics.IDP'
+child_count_app_row = 'form.demographics.adding_child.count_of_children'
+dis_app_row = 'form.demographics.main_recipient_disability'
+
 def select_file():
     global file_path
     file_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx")])
@@ -14,6 +36,24 @@ def select_file():
         disaggregate_button.config(state="normal")
 
 def disaggregate_data():
+    #GLOBAl
+    global age_adult_row
+    global age_adult_row
+    global gender_adult_row
+    global dis_adult_row
+    global age_child_row 
+    global gender_child_row
+    global dis_child_row
+    global age_app_row
+    global gender_app_row
+    global form_app_number
+    global hh_size_app_row
+    global low_app_income
+    global hh_idp_app_row
+    global idp_app_row
+    global child_count_app_row
+    global dis_app_row
+
     forms_df = pd.read_excel(file_path, sheet_name='Forms')
 
     # Filter out rows with non-empty 'repeat_cancel2' or 'repeat_cancel' columns
@@ -37,9 +77,9 @@ def disaggregate_data():
 
     # Process adult data
     for index, row in adult_df.iterrows():
-        age = int(row['form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.age_adult'])
-        gender = row['form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.gender_list_adult']
-        dis = row['form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.disability']
+        age = int(row[age_adult_row])
+        gender = row[gender_adult_row]
+        dis = row[dis_adult_row]
 
         for group, age_range in age_groups.items():
             if age_range['min'] <= age <= age_range['max']:
@@ -52,9 +92,9 @@ def disaggregate_data():
 
     # Process child data
     for index, row in child_df.iterrows():
-        age = int(row['form.demographics.adding_child.hh_childs.list_for_child.repeated_data.age_child'])
-        gender = row['form.demographics.adding_child.hh_childs.list_for_child.repeated_data.gender_list_child']
-        dis = row['form.demographics.adding_child.hh_childs.list_for_child.repeated_data.disability']
+        age = int(row[age_child_row])
+        gender = row[gender_child_row]
+        dis = row[dis_child_row]
 
         for group, age_range in age_groups.items():
             if age_range['min'] <= age <= age_range['max']:
@@ -67,15 +107,15 @@ def disaggregate_data():
 
     # Process applicant data from 'Forms' sheet
     for index, row in forms_df.iterrows():
-        age = int(row['form.demographics.age'])
-        gender = row['form.demographics.gender']
-        number = row['number']
-        hh_size = row['form.demographics.hh_size']
-        low_income = row['form.demographics.low_income']
-        hh_idp = row['form.demographics.HH_hosting_IDPs']
-        idp = row['form.demographics.IDP']
-        child_count = row['form.demographics.adding_child.count_of_children']
-        dis = row['form.demographics.main_recipient_disability']
+        age = int(row[age_app_row])
+        gender = row[gender_app_row]
+        number = row[form_app_number]
+        hh_size = row[hh_size_app_row]
+        low_income = row[low_app_income]
+        hh_idp = row[hh_idp_app_row]
+        idp = row[idp_app_row]
+        child_count = row[child_count_app_row]
+        dis = row[dis_app_row]
 
         for group, age_range in age_groups.items():
             if age_range['min'] <= age <= age_range['max']:
@@ -97,16 +137,13 @@ def disaggregate_data():
                     idp_count += int(hh_size)
 
         # Check if main applicant or any household member is 60 or above
-        if age >= 60 or any(int(row['form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.age_adult']) >= 60
-                        for index, row in adult_df[adult_df['number'] == number].iterrows()):
-            households_60_plus += 1
-        elif any(int(row['form.demographics.adding_child.hh_childs.list_for_child.repeated_data.age_child']) >= 60
-                for index, row in child_df[child_df['number'] == number].iterrows()):
+        if age >= 60 or any(int(row[age_adult_row]) >= 60
+                        for index, row in adult_df[adult_df[form_app_number] == number].iterrows()):
             households_60_plus += 1
 
         # Get HH with children age < 5
-        if age <= 5 or any(int(row['form.demographics.adding_child.hh_childs.list_for_child.repeated_data.age_child']) <= 5
-                for index, row in child_df[child_df['number'] == number].iterrows()):
+        if age <= 5 or any(int(row[age_child_row]) <= 5
+                for index, row in child_df[child_df[form_app_number] == number].iterrows()):
             hh_children_under_5 += 1
 
     # Calculate overall number of people for each age group
@@ -118,7 +155,7 @@ def disaggregate_data():
     results_text.insert(tk.END, str(male_data) + "\n")
     results_text.insert(tk.END, "Female Data:\n")
     results_text.insert(tk.END, str(female_data) + "\n")
-    results_text.insert(tk.END, "\nOverall number of peoples: " + str(sum(overall_data.values())) + "\n")
+    results_text.insert(tk.END, "\nOverall number of people: " + str(sum(overall_data.values())) + "\n")
     results_text.insert(tk.END, "Disabilities Data: " + str(disabilities_data) + "\n")
     results_text.insert(tk.END, "Low Income: " + str(low_income_data) + "\n")
     results_text.insert(tk.END, "IDP HH: " + str(idp_hh) + "\n")
