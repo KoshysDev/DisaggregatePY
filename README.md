@@ -11,7 +11,7 @@ You can install this application by following these steps:
 Clone the repository to your local machine:
 
 ```
-git clone <repository_url>
+git clone https://github.com/KoshysDev/DisaggregatePY.git
 ```
 
 
@@ -24,7 +24,7 @@ Use the appropriate compile script for your operating system:
 
 ### Download Latest Release
 
-Alternatively, you can download the latest release from the [releases page](<release_url>) and follow the instructions provided.
+Alternatively, you can download the latest release from the [releases page](<https://github.com/KoshysDev/DisaggregatePY/releases>) and follow the instructions provided.
 
 ## Usage
 
@@ -54,7 +54,5 @@ pip install pandas tkinter
 
 ## License
 
-"""
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-"""
 
