@@ -24,7 +24,7 @@ Use the appropriate compile script for your operating system:
 
 ### Download Latest Release
 
-Alternatively, you can download the latest release from the [releases page](<https://github.com/KoshysDev/DisaggregatePY/releases>) and follow the instructions provided.
+Alternatively, you can download the latest release from the [releases page](<https://github.com/KoshysDev/DisaggregatePY/releases>).
 
 ## Usage
 
