@@ -165,6 +165,14 @@ def disaggregate_data():
     results_text.insert(tk.END, "HH with children under 5: " + str(hh_children_under_5) + "\n")
     results_text.insert(tk.END, "HH 60+: " + str(households_60_plus) + "\n")
 
+def try_disaggregate_data():
+    try:
+        disaggregate_data()
+    except KeyError as e:
+        messagebox.showerror("Key Error", f"A key error occurred: {str(e)}")
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {str(e)}")  
+
 def add_age_group():
     dialog = tk.Toplevel(root)
     dialog.title("Add Age Group")
@@ -300,7 +308,7 @@ select_button.pack()
 selected_file_label = ttk.Label(file_frame, text="Selected File: None")
 selected_file_label.pack()
 
-disaggregate_button = ttk.Button(root, text="Disaggregate", command=disaggregate_data, state="disabled")
+disaggregate_button = ttk.Button(root, text="Disaggregate", command=try_disaggregate_data, state="disabled")
 disaggregate_button.pack(pady=10)
 
 age_group_frame = ttk.Frame(root)
