@@ -84,6 +84,8 @@ def disaggregate_data():
 
     # Process adult data
     for index, row in adult_df.iterrows():
+        if(row[age_adult_row] == '---'): 
+            continue
         age = int(row[age_adult_row])
         gender = row[gender_adult_row]
         dis = row[dis_adult_row]
@@ -99,6 +101,8 @@ def disaggregate_data():
 
     # Process child data
     for index, row in child_df.iterrows():
+        if(row[age_child_row] == '---'): 
+            continue
         age = int(row[age_child_row])
         gender = row[gender_child_row]
         dis = row[dis_child_row]
@@ -114,6 +118,8 @@ def disaggregate_data():
 
     # Process applicant data from 'Forms' sheet
     for index, row in forms_df.iterrows():
+        if(row[age_app_row] == '---'): 
+            continue
         age = int(row[age_app_row])
         gender = row[gender_app_row]
         number = row[form_app_number]
@@ -144,13 +150,13 @@ def disaggregate_data():
                     idp_count += int(hh_size)
 
         # Check if main applicant or any household member is 60 or above
-        if age >= 60 or any(int(row[age_adult_row]) >= 60
-                        for index, row in adult_df[adult_df[form_app_number] == number].iterrows()):
+        if age >= 60 or any(row[age_adult_row] != '---' and int(row[age_adult_row]) >= 60
+                            for index, row in adult_df[adult_df[form_app_number] == number].iterrows()):
             households_60_plus += 1
 
         # Get HH with children age < 5
-        if age <= 5 or any(int(row[age_child_row]) <= 5
-                for index, row in child_df[child_df[form_app_number] == number].iterrows()):
+        if age <= 5 or any(row[age_child_row] != '---' and int(row[age_child_row]) <= 5
+                        for index, row in child_df[child_df[form_app_number] == number].iterrows()):
             hh_children_under_5 += 1
 
     # Calculate overall number of people for each age group
