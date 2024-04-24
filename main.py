@@ -1,4 +1,5 @@
-import os
+import os, json
+from config import create_config_file
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
@@ -6,27 +7,33 @@ from tkinter import ttk, messagebox, filedialog
 file_path = '' # Global variable to store the file path
 age_groups = {'0-4 y. o.': {'min': 0, 'max': 4}} # Global variable to store age groups
 
-#global config var
+# Load config from file or use defaults
+config_file = "config.json"
+create_config_file(config_file) # Create if it doesn't exist
+with open(config_file) as f:
+    config = json.load(f)
+
+#global search rows
 #Adult Data
-age_adult_row = 'form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.age_adult'
-gender_adult_row = 'form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.gender_list_adult'
-dis_adult_row = 'form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.disability'
+age_adult_row = config['age_adult_row']
+gender_adult_row = config['gender_adult_row']
+dis_adult_row = config['dis_adult_row']
 
 #Child Data
-age_child_row = 'form.demographics.adding_child.hh_childs.list_for_child.repeated_data.age_child'
-gender_child_row = 'form.demographics.adding_child.hh_childs.list_for_child.repeated_data.gender_list_child'
-dis_child_row = 'form.demographics.adding_child.hh_childs.list_for_child.repeated_data.disability'
+age_child_row = config['age_child_row']
+gender_child_row = config['gender_child_row']
+dis_child_row = config['dis_child_row']
 
 #Applicant Data
-age_app_row = 'form.demographics.age'
-gender_app_row = 'form.demographics.gender'
-form_app_number = 'number'
-hh_size_app_row = 'form.demographics.hh_size'
-low_app_income = 'form.demographics.low_income'
-hh_idp_app_row = 'form.demographics.HH_hosting_IDPs'
-idp_app_row = 'form.demographics.IDP'
-child_count_app_row = 'form.demographics.adding_child.count_of_children'
-dis_app_row = 'form.demographics.main_recipient_disability'
+age_app_row = config['age_app_row']
+gender_app_row = config['gender_app_row']
+form_app_number = config['form_app_number']
+hh_size_app_row = config['hh_size_app_row']
+low_app_income = config['low_app_income']
+hh_idp_app_row = config['hh_idp_app_row']
+idp_app_row = config['idp_app_row']
+child_count_app_row = config['child_count_app_row']
+dis_app_row = config['dis_app_row']
 
 def select_file():
     global file_path
@@ -267,6 +274,11 @@ def modify_age_group(event):
                 else:
                     max_age = int(max_age_option)
                 age_group_name = f"{min_age}-{max_age_option} y. o."
+
+                # Delete the old age group if it exists
+                if selected_age_group in age_groups:
+                    del age_groups[selected_age_group]
+
                 age_groups[age_group_name] = {'min': min_age, 'max': max_age}
                 #messagebox.showinfo("Success", f"Age group '{age_group_name}' added successfully!")
                 refresh_age_groups()

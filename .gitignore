@@ -17,3 +17,6 @@ venv/
 # Ignore distribution/build files
 dist/
 build/
+
+#files
+config.json
