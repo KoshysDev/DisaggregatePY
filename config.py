@@ -18,6 +18,7 @@ DEFAULT_CONFIG = {
     'idp_app_row': 'form.demographics.IDP',
     'child_count_app_row': 'form.demographics.adding_child.count_of_children',
     'dis_app_row': 'form.demographics.main_recipient_disability',
+    'ignore_form_ids': [],
 }
 
 CONFIG_FILE = "config.json"

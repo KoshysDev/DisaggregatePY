@@ -33,9 +33,36 @@ def process_data(df, age_row, gender_row, dis_row, age_groups, male_data, female
                     disabilities_data += 1        
 
 def disaggregate_data():
+    # forms_df = pd.read_excel(file_path, sheet_name='Forms')
+    # adult_df = pd.read_excel(file_path, sheet_name='Repeat- hh_adult').dropna(subset=['number__0'])
+    # child_df = pd.read_excel(file_path, sheet_name='Repeat- hh_childs').dropna(subset=['number__0'])
+
+    # household_count = forms_df['number'].count()
+
+    # # Filter out numbers from adult_df and child_df that have applicants and are not ignored
+    # adult_numbers = set(adult_df['number__0'])
+    # child_numbers = set(child_df['number__0'])
+    # relevant_numbers = adult_numbers.union(child_numbers)
+
+    # forms_df = forms_df[forms_df['number'].isin(relevant_numbers)]
+
+    # # Remember number field for forms that need to be removed
+    # forms_to_remove = forms_df.loc[(forms_df[config['age_app_row']] == '---') | (forms_df['formid'].isin(config['ignore_form_ids'])), 'number'].tolist()
+
+    # # Remove unnecessary fields from adult_df and child_df
+    # adult_df = adult_df[~adult_df['number__0'].isin(forms_to_remove)]
+    # child_df = child_df[~child_df['number__0'].isin(forms_to_remove)]
+
     forms_df = pd.read_excel(file_path, sheet_name='Forms')
-    adult_df = pd.read_excel(file_path, sheet_name='Repeat- hh_adult').dropna(subset=['number__0'])
-    child_df = pd.read_excel(file_path, sheet_name='Repeat- hh_childs').dropna(subset=['number__0'])
+
+    # Filter out rows with non-empty 'repeat_cancel2' or 'repeat_cancel' columns
+    adult_df = pd.read_excel(file_path, sheet_name='Repeat- hh_adult')
+    #adult_df = adult_df[adult_df['number__0'].notna()]
+
+    child_df = pd.read_excel(file_path, sheet_name='Repeat- hh_childs')
+    #child_df = child_df[child_df['number__0'].notna()]
+
+    household_count = forms_df['number'].count()
 
     male_data = {group: 0 for group in age_groups}
     female_data = {group: 0 for group in age_groups}
@@ -96,6 +123,7 @@ def disaggregate_data():
     overall_data = {group: male_data[group] + female_data[group] for group in age_groups}
 
     results_text.delete('1.0', tk.END)
+    results_text.insert(tk.END, "Household Count: " + str(household_count) + "\n")
     results_text.insert(tk.END, "Male Data:\n")
     results_text.insert(tk.END, str(male_data) + "\n")
     results_text.insert(tk.END, "Female Data:\n")
