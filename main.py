@@ -1,39 +1,12 @@
-import os, json
-from config import create_config_file
-import pandas as pd
+import os
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
+import pandas as pd
+from config import load_config
 
 file_path = '' # Global variable to store the file path
 age_groups = {'0-4 y. o.': {'min': 0, 'max': 4}} # Global variable to store age groups
-
-# Load config from file or use defaults
-config_file = "config.json"
-create_config_file(config_file) # Create if it doesn't exist
-with open(config_file) as f:
-    config = json.load(f)
-
-#global search rows
-#Adult Data
-age_adult_row = config['age_adult_row']
-gender_adult_row = config['gender_adult_row']
-dis_adult_row = config['dis_adult_row']
-
-#Child Data
-age_child_row = config['age_child_row']
-gender_child_row = config['gender_child_row']
-dis_child_row = config['dis_child_row']
-
-#Applicant Data
-age_app_row = config['age_app_row']
-gender_app_row = config['gender_app_row']
-form_app_number = config['form_app_number']
-hh_size_app_row = config['hh_size_app_row']
-low_app_income = config['low_app_income']
-hh_idp_app_row = config['hh_idp_app_row']
-idp_app_row = config['idp_app_row']
-child_count_app_row = config['child_count_app_row']
-dis_app_row = config['dis_app_row']
+config = load_config()
 
 def select_file():
     global file_path
@@ -42,35 +15,28 @@ def select_file():
         selected_file_label.config(text=f"Selected File: {file_path}")
         disaggregate_button.config(state="normal")
 
+def process_data(df, age_row, gender_row, dis_row, age_groups, male_data, female_data, disabilities_data):
+    for index, row in df.iterrows():
+        if row[age_row] == '---':
+            continue
+        age = int(row[age_row])
+        gender = row[gender_row]
+        dis = row[dis_row]
+
+        for group, age_range in age_groups.items():
+            if age_range['min'] <= age <= age_range['max']:
+                if gender == 'male':
+                    male_data[group] += 1
+                elif gender == 'female':
+                    female_data[group] += 1
+                if dis == 'yes':
+                    disabilities_data += 1        
+
 def disaggregate_data():
-    #GLOBAl
-    global age_adult_row
-    global age_adult_row
-    global gender_adult_row
-    global dis_adult_row
-    global age_child_row 
-    global gender_child_row
-    global dis_child_row
-    global age_app_row
-    global gender_app_row
-    global form_app_number
-    global hh_size_app_row
-    global low_app_income
-    global hh_idp_app_row
-    global idp_app_row
-    global child_count_app_row
-    global dis_app_row
-
     forms_df = pd.read_excel(file_path, sheet_name='Forms')
+    adult_df = pd.read_excel(file_path, sheet_name='Repeat- hh_adult').dropna(subset=['number__0'])
+    child_df = pd.read_excel(file_path, sheet_name='Repeat- hh_childs').dropna(subset=['number__0'])
 
-    # Filter out rows with non-empty 'repeat_cancel2' or 'repeat_cancel' columns
-    adult_df = pd.read_excel(file_path, sheet_name='Repeat- hh_adult')
-    adult_df = adult_df[adult_df['number__0'].notna()]
-
-    child_df = pd.read_excel(file_path, sheet_name='Repeat- hh_childs')
-    child_df = child_df[child_df['number__0'].notna()]
-
-    # Initialize dictionaries to store disaggregated data
     male_data = {group: 0 for group in age_groups}
     female_data = {group: 0 for group in age_groups}
     disabilities_data = 0
@@ -82,53 +48,23 @@ def disaggregate_data():
     hh_children_under_5 = 0
     households_60_plus = 0
 
-    # Process adult data
-    for index, row in adult_df.iterrows():
-        if(row[age_adult_row] == '---'): 
-            continue
-        age = int(row[age_adult_row])
-        gender = row[gender_adult_row]
-        dis = row[dis_adult_row]
+    process_data(adult_df, config['age_adult_row'], config['gender_adult_row'], config['dis_adult_row'],
+                 age_groups, male_data, female_data, disabilities_data)
+    process_data(child_df, config['age_child_row'], config['gender_child_row'], config['dis_child_row'],
+                 age_groups, male_data, female_data, disabilities_data)
 
-        for group, age_range in age_groups.items():
-            if age_range['min'] <= age <= age_range['max']:
-                if gender == 'male':
-                    male_data[group] += 1
-                elif gender == 'female':
-                    female_data[group] += 1
-                if dis == 'yes':
-                    disabilities_data += 1
-
-    # Process child data
-    for index, row in child_df.iterrows():
-        if(row[age_child_row] == '---'): 
-            continue
-        age = int(row[age_child_row])
-        gender = row[gender_child_row]
-        dis = row[dis_child_row]
-
-        for group, age_range in age_groups.items():
-            if age_range['min'] <= age <= age_range['max']:
-                if gender == 'male':
-                    male_data[group] += 1
-                elif gender == 'female':
-                    female_data[group] += 1
-                if dis == 'yes':
-                    disabilities_data += 1
-
-    # Process applicant data from 'Forms' sheet
     for index, row in forms_df.iterrows():
-        if(row[age_app_row] == '---'): 
+        if row[config['age_app_row']] == '---':
             continue
-        age = int(row[age_app_row])
-        gender = row[gender_app_row]
-        number = row[form_app_number]
-        hh_size = row[hh_size_app_row]
-        low_income = row[low_app_income]
-        hh_idp = row[hh_idp_app_row]
-        idp = row[idp_app_row]
-        child_count = row[child_count_app_row]
-        dis = row[dis_app_row]
+        age = int(row[config['age_app_row']])
+        gender = row[config['gender_app_row']]
+        number = row[config['form_app_number']]
+        hh_size = row[config['hh_size_app_row']]
+        low_income = row[config['low_app_income']]
+        hh_idp = row[config['hh_idp_app_row']]
+        idp = row[config['idp_app_row']]
+        child_count = row[config['child_count_app_row']]
+        dis = row[config['dis_app_row']]
 
         for group, age_range in age_groups.items():
             if age_range['min'] <= age <= age_range['max']:
@@ -149,20 +85,16 @@ def disaggregate_data():
                     idp_hh += 1
                     idp_count += int(hh_size)
 
-        # Check if main applicant or any household member is 60 or above
-        if age >= 60 or any(row[age_adult_row] != '---' and int(row[age_adult_row]) >= 60
-                            for index, row in adult_df[adult_df[form_app_number] == number].iterrows()):
+        if age >= 60 or any(row[config['age_adult_row']] != '---' and int(row[config['age_adult_row']]) >= 60
+                            for index, row in adult_df[adult_df[config['form_app_number']] == number].iterrows()):
             households_60_plus += 1
 
-        # Get HH with children age < 5
-        if age <= 5 or any(row[age_child_row] != '---' and int(row[age_child_row]) <= 5
-                        for index, row in child_df[child_df[form_app_number] == number].iterrows()):
+        if age <= 5 or any(row[config['age_child_row']] != '---' and int(row[config['age_child_row']]) <= 5
+                        for index, row in child_df[child_df[config['form_app_number']] == number].iterrows()):
             hh_children_under_5 += 1
 
-    # Calculate overall number of people for each age group
     overall_data = {group: male_data[group] + female_data[group] for group in age_groups}
 
-    # Display disaggregated data
     results_text.delete('1.0', tk.END)
     results_text.insert(tk.END, "Male Data:\n")
     results_text.insert(tk.END, str(male_data) + "\n")

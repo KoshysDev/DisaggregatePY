@@ -1,7 +1,8 @@
 import os
+import json
 
 # Default search rows
-default_config = {
+DEFAULT_CONFIG = {
     'age_adult_row': 'form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.age_adult',
     'gender_adult_row': 'form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.gender_list_adult',
     'dis_adult_row': 'form.demographics.adding_adult.hh_adult.list_for_adult.repeated_data2.disability',
@@ -19,9 +20,15 @@ default_config = {
     'dis_app_row': 'form.demographics.main_recipient_disability',
 }
 
+CONFIG_FILE = "config.json"
+
 # Function to create config file if it doesn't exist
-def create_config_file(filename="config.json"):
-    if not os.path.exists(filename):
-        import json
-        with open(filename, 'w') as f:
-            json.dump(default_config, f, indent=4)
+def create_config_file():
+    if not os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(DEFAULT_CONFIG, f, indent=4)
+
+def load_config():
+    create_config_file()  # Create if it doesn't exist
+    with open(CONFIG_FILE) as f:
+        return json.load(f)
