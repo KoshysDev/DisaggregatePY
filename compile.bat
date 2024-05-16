@@ -1,6 +1,6 @@
 @echo off
-REM This batch file compiles GUI_DIS.py using PyInstaller
+REM This batch file compiles main.py using PyInstaller
 
-pyinstaller --onefile --noconsole --add-data "azure.tcl;." --add-data "theme;theme" GUI_DIS.py
+pyinstaller --onefile --noconsole --add-data "azure.tcl;." --add-data "theme;theme" --add-data "config.py;." GUI_DIS.py
 
 pause
